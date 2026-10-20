@@ -1,0 +1,51 @@
+version: 4
+origin: studio
+aoi:
+  name: GOAT
+  description: ""
+  tags:
+    input:
+      - name: Stop
+        dataType: BOOL
+      - name: Forward
+        dataType: BOOL
+      - name: Reverse
+        dataType: BOOL
+    output:
+      - name: Temp1
+        dataType: BOOL
+      - name: Temp2
+        dataType: BOOL
+      - name: Forward_led
+        dataType: BOOL
+      - name: Reverse_led
+        dataType: BOOL
+      - name: Forwardslow_led
+        dataType: BOOL
+      - name: Reverseslow_led
+        dataType: BOOL
+    local:
+      - name: Timer_forward
+        dataType: TIMER
+        defaultValue:
+          PRE: 10000
+      - name: Timer_reverse
+        dataType: TIMER
+        defaultValue:
+          PRE: 10000
+      - name: Forward_motor
+        dataType: BOOL
+      - name: Reverse_motor
+        dataType: BOOL
+  routines:
+    Logic:
+      type: ld
+      content: |-
+        XIO(Stop)[XIC(Forward),XIC(Temp1)]XIO(Reverse)OTE(Temp1);
+        XIC(Temp1)XIO(Timer_reverse.DN)XIO(Timer_forward.TT)[OTE(Forward_led),OTE(Forward_motor)];
+        XIC(Forward_motor)TOF(Timer_forward);
+        XIC(Timer_forward.TT)OTE(Forwardslow_led);
+        XIO(Stop)[XIC(Reverse),XIC(Temp2)]XIO(Forward)OTE(Temp2);
+        XIC(Temp2)XIO(Timer_forward.DN)XIO(Timer_reverse.TT)[OTE(Reverse_motor),OTE(Reverse_led)];
+        XIC(Reverse_motor)TOF(Timer_reverse);
+        XIC(Timer_reverse.TT)OTE(Reverseslow_led);
